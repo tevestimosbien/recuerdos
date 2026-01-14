@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Recuerdo</title>
+</head>
+<body style="margin:0;background:#fff;">
+  <div style="max-width:720px;margin:0 auto;padding:24px 16px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;">
+    <div style="text-align:center;margin-top:10px;">
+      <div style="font-size:28px;font-weight:800;line-height:1.2;">Un recuerdo para vos 🤍</div>
+      <div style="margin-top:10px;font-size:16px;opacity:.85;">
+        Este mensaje fue hecho con amor. Cuando estés listo, tocá play.
+      </div>
+    </div>
+
+    <div style="margin:22px auto 0;background:#fff;border:1px solid rgba(0,0,0,.10);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.06);padding:18px;">
+      <div style="display:flex;gap:14px;align-items:center;">
+        <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#ff4d6d,#ff8fab);display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;">
+          ♥
+        </div>
+        <div style="flex:1;">
+          <div id="titulo-recuerdo" style="font-weight:800;font-size:16px;">Tu audio</div>
+          <div style="font-size:13px;opacity:.75;margin-top:2px;">
+            Código: <span id="codigo">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;">
+        <div id="player"></div>
+        <div id="mensaje" style="margin-top:10px;font-size:13px;opacity:.75;"></div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:16px;font-size:12px;opacity:.7;">
+      Tip: si no se reproduce, probá subir el volumen del celular o usar auriculares 🎧
+    </div>
+  </div>
+
+  <script src="./recuerdo.js"></script>
+</body>
+</html>
