@@ -9,43 +9,74 @@
 
   if (!codigoEl || !tituloEl || !msgEl || !playerEl) return;
 
-  const AUDIO_MAP = {
-    "PRUEBA1": {
-      url: "https://www.dropbox.com/scl/fi/izfnrb0ugihy0x0u8jpj9/WhatsApp-Ptt-2026-01-14-at-11.05.16.mp3?rlkey=7bguec0tp0a4xaum42z1ibaum&st=pzz810th&dl=1",
-      title: "Un recuerdo especial",
-      note: "Este mensaje fue grabado con mucho amor 🤍"
-    },
-
-    "A7M9Q2": {
-      url: "https://www.dropbox.com/scl/fi/zi7zri3ui23k69uxbri5l/prueba-N2.mp3?rlkey=tsurqy2r0vqkfftqlt4iso4jv&st=61g669qh&dl=1",
-      title: "Un mensaje para vos 🤍",
-      note: "Escuchalo cuando lo necesites."
-    }
-  };
+  const SHEET_CSV_URL =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vSUekUYBRPXlEo7cHOe0WUH64vUzo-nl87xrEnxIeev1FdsEhBvSpOeOkGI2DFpliKsCeiq_m_AZixC/pub?output=csv";
 
   codigoEl.textContent = code || "—";
 
+  function showError(title, msg) {
+    tituloEl.textContent = title;
+    msgEl.textContent = msg;
+    playerEl.innerHTML = "";
+  }
+
   if (!code) {
-    tituloEl.textContent = "Falta el código";
-    msgEl.textContent = "Escaneá el QR para abrir tu audio.";
+    showError("Falta el código", "Escaneá el QR para abrir tu audio.");
     return;
   }
 
-  const item = AUDIO_MAP[code];
-  if (!item) {
-    tituloEl.textContent = "No encontramos tu audio";
-    msgEl.textContent = "El código puede estar mal o el audio todavía no fue cargado. Escribinos y lo resolvemos.";
-    return;
+  function parseCSV(text) {
+    const lines = text.trim().split(/\r?\n/);
+    const headers = lines[0].split(",").map(h => h.trim());
+    const rows = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(",");
+      const obj = {};
+      headers.forEach((h, idx) => {
+        obj[h] = (cols[idx] || "").trim();
+      });
+      rows.push(obj);
+    }
+    return rows;
   }
 
-  tituloEl.textContent = item.title || "Tu audio";
-  msgEl.textContent = item.note || "";
+  fetch(SHEET_CSV_URL, { cache: "no-store" })
+    .then(r => {
+      if (!r.ok) throw new Error("No se pudo leer la planilla");
+      return r.text();
+    })
+    .then(csvText => {
+      const rows = parseCSV(csvText);
+      const item = rows.find(r => (r.code || "").toUpperCase() === code);
 
-  const audio = document.createElement("audio");
-  audio.controls = true;
-  audio.style.width = "100%";
-  audio.src = item.url;
+      if (!item || !item.url) {
+        showError(
+          "No encontramos tu audio",
+          "El código puede estar mal o el audio todavía no fue cargado."
+        );
+        return;
+      }
 
-  playerEl.innerHTML = "";
-  playerEl.appendChild(audio);
+      // seguridad: si alguien se equivoca con dl=0
+      const url = item.url.replace("dl=0", "dl=1");
+
+      tituloEl.textContent = item.title || "Tu audio";
+      msgEl.textContent = item.note || "";
+
+      const audio = document.createElement("audio");
+      audio.controls = true;
+      audio.style.width = "100%";
+      audio.src = url;
+
+      playerEl.innerHTML = "";
+      playerEl.appendChild(audio);
+    })
+    .catch(() => {
+      showError(
+        "Error",
+        "No se pudo cargar la base de audios. Probá nuevamente."
+      );
+    });
 })();
+
